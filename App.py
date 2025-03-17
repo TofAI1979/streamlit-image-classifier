@@ -24,10 +24,10 @@ transform = transforms.Compose([
 st.set_page_config(page_title="AI Image Classifier", page_icon="📷", layout="wide")
 
 st.title("📷 AI Image Classifier")
-st.markdown("#### Upload any images and let AI classify them! It work best with cat and dogs")
+st.markdown("#### Upload images of cats and dogs, and let AI classify them!")
 st.write("Supported formats: **JPG, PNG, JPEG**")
 
-# Session state to track uploaded files
+# Initialize session state for uploaded files
 if "uploaded_files" not in st.session_state:
     st.session_state.uploaded_files = []
 
@@ -38,32 +38,36 @@ uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_file
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
 
-# Clear All Button
+# Clear All Button (Fix)
 if st.session_state.uploaded_files:
     if st.button("🗑️ Clear All", key="clear_button"):
-        st.session_state.uploaded_files = []
-        st.experimental_rerun()  # Refresh the app to remove all images
+        st.session_state.uploaded_files = []  # Clear the session state
+        st.rerun()  # Refresh the app properly
 
+# Display uploaded images
 if st.session_state.uploaded_files:
     cols = st.columns(len(st.session_state.uploaded_files))  # Create dynamic columns for images
     for i, uploaded_file in enumerate(st.session_state.uploaded_files):
-        # Open image
-        image = Image.open(uploaded_file).convert("RGB")
+        try:
+            # Open image
+            image = Image.open(uploaded_file).convert("RGB")
 
-        # Show a processing message
-        with st.spinner("🔍 Classifying..."):
-            # Apply transformations
-            input_tensor = transform(image).unsqueeze(0)
+            # Show a processing message
+            with st.spinner("🔍 Classifying..."):
+                # Apply transformations
+                input_tensor = transform(image).unsqueeze(0)
 
-            # Perform inference
-            with torch.no_grad():
-                output = model(input_tensor)
+                # Perform inference
+                with torch.no_grad():
+                    output = model(input_tensor)
 
-            # Get predicted class
-            predicted_class = torch.argmax(output[0]).item()
-            predicted_label = class_labels[predicted_class]
+                # Get predicted class
+                predicted_class = torch.argmax(output[0]).item()
+                predicted_label = class_labels[predicted_class]
 
-        # Display the image in a column
-        with cols[i]:  
-            st.image(image, caption=f"📝 Prediction: **{predicted_label}**", use_container_width=True)
-            st.success(f"✅ {predicted_label}")
+            # Display the image in a column
+            with cols[i]:  
+                st.image(image, caption=f"📝 Prediction: **{predicted_label}**", use_container_width=True)
+                st.success(f"✅ {predicted_label}")
+        except Exception as e:
+            st.error(f"Error processing image: {str(e)}")
