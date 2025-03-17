@@ -43,7 +43,7 @@ if uploaded_files:
 if st.session_state.uploaded_files:
     if st.button("🗑️ Remove All", key="remove_all_button"):
         st.session_state.uploaded_files = []  # Clear the session state
-        st.experimental_rerun()  # Refresh the app
+        st.rerun()  # Refresh the app
 
 # Display uploaded images if they exist
 if st.session_state.uploaded_files:
