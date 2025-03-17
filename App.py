@@ -32,7 +32,7 @@ st.write("Supported formats: **JPG, PNG, JPEG**")
 uploaded_files = st.file_uploader("Upload images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
 
 # URL Input Section
-image_url = st.text_input("Or enter an image URL")
+# image_url = st.text_input("Or enter an image URL")
 
 # Store images to process
 images_to_process = []
