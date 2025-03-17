@@ -43,15 +43,6 @@ if uploaded_files:
         image = Image.open(uploaded_file).convert("RGB")
         images_to_process.append(image)
 
-# Handle image from URL
-if image_url:
-    try:
-        with urllib.request.urlopen(image_url) as response:
-            image_data = response.read()
-            image = Image.open(io.BytesIO(image_data)).convert("RGB")
-            images_to_process.append(image)
-    except Exception as e:
-        st.error(f"⚠️ Unable to load image from URL: {e}")
 
 # Classify and display images
 if images_to_process:
