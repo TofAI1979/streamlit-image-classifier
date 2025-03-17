@@ -6,7 +6,8 @@ from PIL import Image
 import urllib.request
 
 # Load the pre-trained ResNet-18 model
-model = models.resnet18(pretrained=True)
+# Previous: model = models.resnet18(pretrained=True)
+model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 model.eval()
 
 # Load ImageNet class labels
