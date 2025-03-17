@@ -29,22 +29,22 @@ st.write("Supported formats: **JPG, PNG, JPEG**")
 
 # Initialize session state for uploaded files
 if "uploaded_files" not in st.session_state:
-    st.session_state.uploaded_files = []
+    st.session_state.uploaded_files = None  # Set to None initially
 
 # Upload Section
 uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
 
-# Store files in session state
+# Store files in session state if uploaded
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
 
 # Clear All Button (Fix)
 if st.session_state.uploaded_files:
     if st.button("🗑️ Clear All", key="clear_button"):
-        st.session_state.uploaded_files = []  # Clear the session state
-        st.rerun()  # Refresh the app properly
+        st.session_state.uploaded_files = None  # Reset session state
+        st.rerun()  # Force rerun to refresh UI
 
-# Display uploaded images
+# Display uploaded images if they exist
 if st.session_state.uploaded_files:
     cols = st.columns(len(st.session_state.uploaded_files))  # Create dynamic columns for images
     for i, uploaded_file in enumerate(st.session_state.uploaded_files):
