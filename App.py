@@ -49,6 +49,9 @@ if images_to_process:
     cols = st.columns(len(images_to_process))  # Create dynamic columns for images
     for i, image in enumerate(images_to_process):
         try:
+            # Resize image to ensure uniform preview size (~3x3 cm)
+            preview_image = image.resize((90, 90))  
+
             # Show a processing message
             with st.spinner("🔍 Classifying..."):
                 # Apply transformations
@@ -62,9 +65,9 @@ if images_to_process:
                 predicted_class = torch.argmax(output[0]).item()
                 predicted_label = class_labels[predicted_class]
 
-            # Display the image
+            # Display the resized image
             with cols[i]:  
-                st.image(image, use_container_width=True)
+                st.image(preview_image, use_container_width=False)
                 st.success(f"✅ {predicted_label}")
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")
