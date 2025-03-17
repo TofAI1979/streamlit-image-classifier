@@ -25,7 +25,7 @@ transform = transforms.Compose([
 st.set_page_config(page_title="AI Image Classifier", page_icon="📷", layout="wide")
 
 st.title("📷 AI Image Classifier")
-st.markdown("#### Upload an image or paste a link to classify it!")
+st.markdown("#### Upload one or multiple images to classify it!")
 st.write("Supported formats: **JPG, PNG, JPEG**")
 
 # Upload Section
