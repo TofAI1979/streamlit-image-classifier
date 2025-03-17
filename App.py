@@ -24,15 +24,29 @@ transform = transforms.Compose([
 st.set_page_config(page_title="AI Image Classifier", page_icon="📷", layout="wide")
 
 st.title("📷 AI Image Classifier")
-st.markdown("#### Upload images of cats and dogs, and let AI classify them!")
+st.markdown("#### Upload any images and let AI classify them! It work best with cat and dogs")
 st.write("Supported formats: **JPG, PNG, JPEG**")
+
+# Session state to track uploaded files
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
 
 # Upload Section
 uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
 
+# Store files in session state
 if uploaded_files:
-    cols = st.columns(len(uploaded_files))  # Create dynamic columns for images
-    for i, uploaded_file in enumerate(uploaded_files):
+    st.session_state.uploaded_files = uploaded_files
+
+# Clear All Button
+if st.session_state.uploaded_files:
+    if st.button("🗑️ Clear All", key="clear_button"):
+        st.session_state.uploaded_files = []
+        st.experimental_rerun()  # Refresh the app to remove all images
+
+if st.session_state.uploaded_files:
+    cols = st.columns(len(st.session_state.uploaded_files))  # Create dynamic columns for images
+    for i, uploaded_file in enumerate(st.session_state.uploaded_files):
         # Open image
         image = Image.open(uploaded_file).convert("RGB")
 
@@ -53,6 +67,3 @@ if uploaded_files:
         with cols[i]:  
             st.image(image, caption=f"📝 Prediction: **{predicted_label}**", use_container_width=True)
             st.success(f"✅ {predicted_label}")
-
-
-
