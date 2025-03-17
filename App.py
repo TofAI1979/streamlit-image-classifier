@@ -29,7 +29,7 @@ st.write("Supported formats: **JPG, PNG, JPEG**")
 
 # Initialize session state for uploaded files
 if "uploaded_files" not in st.session_state:
-    st.session_state.uploaded_files = None  # Set to None initially
+    st.session_state.uploaded_files = []
 
 # Upload Section
 uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
@@ -38,11 +38,11 @@ uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_file
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
 
-# Clear All Button (Fix)
+# Remove All Button (Fixed)
 if st.session_state.uploaded_files:
-    if st.button("🗑️ Clear All", key="clear_button"):
-        st.session_state.uploaded_files = None  # Reset session state
-        st.rerun()  # Force rerun to refresh UI
+    if st.button("🗑️ Remove All", key="remove_all_button"):
+        st.session_state.uploaded_files = []  # Clear the session state
+        st.experimental_rerun()  # Refresh the app
 
 # Display uploaded images if they exist
 if st.session_state.uploaded_files:
@@ -65,9 +65,9 @@ if st.session_state.uploaded_files:
                 predicted_class = torch.argmax(output[0]).item()
                 predicted_label = class_labels[predicted_class]
 
-            # Display the image in a column
+            # Display the image in a column **without a caption**
             with cols[i]:  
-                st.image(image, caption=f"📝 Prediction: **{predicted_label}**", use_container_width=True)
-                st.success(f"✅ {predicted_label}")
+                st.image(image, use_container_width=True)  # Removed caption
+                st.success(f"✅ {predicted_label}")  # Still show the prediction
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")
