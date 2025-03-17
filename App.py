@@ -43,6 +43,6 @@ if uploaded_files:
         predicted_label = class_labels[predicted_class]
 
         # Display results
-        st.image(image, caption=f"Predicted: {predicted_label}", use_column_width=True)
+        st.image(image, caption=f"Predicted: {predicted_label}", use_container_width=True)
         st.write(f"### Predicted Label: {predicted_label}")
 
