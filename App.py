@@ -4,9 +4,9 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
 import urllib.request
+import io
 
 # Load the pre-trained ResNet-18 model
-# Previous: model = models.resnet18(pretrained=True)
 model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
 model.eval()
 
@@ -24,35 +24,40 @@ transform = transforms.Compose([
 # 🎨 UI Improvements
 st.set_page_config(page_title="AI Image Classifier", page_icon="📷", layout="wide")
 
-st.title("📷 Tof AI Image Classifier")
-st.markdown("#### Upload images of cats and dogs, and let AI classify them!")
+st.title("📷 AI Image Classifier")
+st.markdown("#### Upload an image or paste a link to classify it!")
 st.write("Supported formats: **JPG, PNG, JPEG**")
 
-# Initialize session state for uploaded files
-if "uploaded_files" not in st.session_state:
-    st.session_state.uploaded_files = []
-
 # Upload Section
-uploaded_files = st.file_uploader("Upload multiple images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
+uploaded_files = st.file_uploader("Upload images", accept_multiple_files=True, type=["jpg", "png", "jpeg"])
 
-# Store files in session state if uploaded
+# URL Input Section
+image_url = st.text_input("Or enter an image URL")
+
+# Store images to process
+images_to_process = []
+
+# Handle uploaded files
 if uploaded_files:
-    st.session_state.uploaded_files = uploaded_files
+    for uploaded_file in uploaded_files:
+        image = Image.open(uploaded_file).convert("RGB")
+        images_to_process.append(image)
 
-# Remove All Button (Fixed)
-if st.session_state.uploaded_files:
-    if st.button("🗑️ Remove All", key="remove_all_button"):
-        st.session_state.uploaded_files = []  # Clear the session state
-        st.rerun()  # Refresh the app
+# Handle image from URL
+if image_url:
+    try:
+        with urllib.request.urlopen(image_url) as response:
+            image_data = response.read()
+            image = Image.open(io.BytesIO(image_data)).convert("RGB")
+            images_to_process.append(image)
+    except Exception as e:
+        st.error(f"⚠️ Unable to load image from URL: {e}")
 
-# Display uploaded images if they exist
-if st.session_state.uploaded_files:
-    cols = st.columns(len(st.session_state.uploaded_files))  # Create dynamic columns for images
-    for i, uploaded_file in enumerate(st.session_state.uploaded_files):
+# Classify and display images
+if images_to_process:
+    cols = st.columns(len(images_to_process))  # Create dynamic columns for images
+    for i, image in enumerate(images_to_process):
         try:
-            # Open image
-            image = Image.open(uploaded_file).convert("RGB")
-
             # Show a processing message
             with st.spinner("🔍 Classifying..."):
                 # Apply transformations
@@ -66,9 +71,9 @@ if st.session_state.uploaded_files:
                 predicted_class = torch.argmax(output[0]).item()
                 predicted_label = class_labels[predicted_class]
 
-            # Display the image in a column **without a caption**
+            # Display the image
             with cols[i]:  
-                st.image(image, use_container_width=True)  # Removed caption
-                st.success(f"✅ {predicted_label}")  # Still show the prediction
+                st.image(image, use_container_width=True)
+                st.success(f"✅ {predicted_label}")
         except Exception as e:
             st.error(f"Error processing image: {str(e)}")
